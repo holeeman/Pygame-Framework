@@ -36,6 +36,7 @@ class Player(Object):
 
         # Move
         if keyboard_pressed(K_UP) and not self.dummy:
+            self.sprite_index = spr_jump
             if self.y >= self.ground:
                 self.vspeed = -30
 
@@ -56,7 +57,14 @@ class Player(Object):
             self.punch = True
             self.sprite_index = spr_punch
             self.ispeed = 2
-
+        if keyboard_pressed(ord('x')) and self.punch == False and not self.dummy:
+            self.punch = True
+            self.sprite_index = spr_mpunch
+            self.ispeed = 2
+        if keyboard_pressed(ord('c')) and self.punch == False and not self.dummy:
+            self.punch = True
+            self.sprite_index = spr_hpunch
+            self.ispeed = 1
         # Vertical Position due to the vertical speed
         self.y += self.vspeed
         self.vspeed += self.gravity/2

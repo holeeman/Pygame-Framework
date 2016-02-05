@@ -105,3 +105,4 @@ def game_start(game_init=None):
         keyboardPrev = keyboardInput
         pygame.display.update()
         clock.tick(FPS)
+    print "end"
