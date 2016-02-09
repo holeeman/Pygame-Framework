@@ -1,4 +1,5 @@
 from constants import *
+import math
 
 # Setting
 pygame.init()
@@ -14,6 +15,8 @@ surface = pygame.display.set_mode(screenResolution)
 clock = pygame.time.Clock()
 keyboardPrev = []
 keyboardInput = []
+mousePrev = ()
+mouseInput = ()
 instanceList = []
 
 
@@ -26,10 +29,19 @@ def game_end():
 # --- Useful Function ---
 
 
-def draw_text(x,y,text="", color=BLACK):
+def draw_set_font(font):
+    global gameFont
+    gameFont = font
+
+
+def draw_text(x, y, text="", color=BLACK):
     # Draws text
     _txt = gameFont.render(str(text), True, color)
     surface.blit(_txt, (x, y))
+
+
+def draw_sprite(x, y, sprite, index=0):
+    surface.blit(sprite.get_image(index), (x, y))
 
 
 def display_get_width():
@@ -42,11 +54,33 @@ def display_get_height():
     return screenResolution[1]
 
 
+def display_resize(width, height):
+    # Reset the size of display
+    global screenResolution
+    global surface
+    screenResolution = (width, height)
+    surface = pygame.display.set_mode(screenResolution)
+
+
+def display_set_screen(state):
+    global surface
+    if state:
+        surface = pygame.display.set_mode(screenResolution, pygame.FULLSCREEN)
+    else:
+        surface = pygame.display.set_mode(screenResolution)
+
+
+def display_set_background_color(color):
+    global gameBackgroundColor
+    gameBackgroundColor = color
+
+
 def keyboard_button(key):
     # Check if a keyboard button is on hold
     try:
         if keyboardInput[key]:
             return True
+        return False
     except:
         return False
 
@@ -56,6 +90,7 @@ def keyboard_released(key):
     try:
         if keyboardPrev[key] and not keyboardInput[key]:
             return True
+        return False
     except:
         return False
 
@@ -65,8 +100,51 @@ def keyboard_pressed(key):
     try:
         if not keyboardPrev[key] and keyboardInput[key]:
             return True
+        return False
     except:
         return False
+
+
+def mouse_button(key):
+    # Check if a mouse button is on hold
+    try:
+        if mouseInput[key]:
+            return True
+        return False
+    except:
+        return False
+
+
+def mouse_released(key):
+    # Check if a mouse button is released
+    try:
+        if mousePrev[key] and not mouseInput[key]:
+            return True
+        return False
+    except:
+        return False
+
+
+def mouse_pressed(key):
+    # Check if a mouse button is pressed
+    try:
+        if not mousePrev[key] and mouseInput[key]:
+            return True
+        return False
+    except:
+        return False
+
+
+def mouse_x():
+    # Get x position of mouse
+    pos = pygame.mouse.get_pos()
+    return pos[0]
+
+
+def mouse_y():
+    # Get y position of mouse
+    pos = pygame.mouse.get_pos()
+    return pos[1]
 
 
 def instance_create(obj, x=0, y=0):
@@ -75,6 +153,32 @@ def instance_create(obj, x=0, y=0):
     ins.init()
     instanceList.append(ins)
     return ins
+
+
+def point_distance(x1, y1, x2, y2):
+    # Return distance between to points
+    return math.sqrt(pow(x2-x1,2) + pow(y2-y1,2))
+
+
+def point_direction(x1, y1, x2, y2, in_degree=True):
+    # Return direction from one point to another
+    if in_degree:
+        return math.atan2((y2-y1), (x2-x1))*(math.pi/180)
+    else:
+        return math.atan2((y2-y1), (x2-x1))
+
+
+def collision_rectangle(box1, box2):
+    # Rectangular collision check
+    if box2[0] > box1[0] + box1[2]:
+        return False
+    if box1[0] > box2[0] + box2[2]:
+        return False
+    if box1[1] > box2[1] + box2[3]:
+        return False
+    if box2[1] > box1[1] + box1[3]:
+        return False
+    return True
 
 
 # game_control
@@ -93,15 +197,17 @@ def game_start(game_init=None):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_end()
-            global keyboardInput
+            global keyboardInput, mouseInput
             keyboardInput = pygame.key.get_pressed()
+            mouseInput = pygame.mouse.get_pressed()
 
         # Go through instances
         for instance in instanceList:
             # Executes codes in update
             instance.update()
 
-        global keyboardPrev
+        global keyboardPrev, mousePrev
         keyboardPrev = keyboardInput
+        mousePrev = mouseInput
         pygame.display.update()
         clock.tick(FPS)
