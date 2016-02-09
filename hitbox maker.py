@@ -1,7 +1,7 @@
 from core import *
 from classes import *
 import glob, os, json
-spr_list = glob.glob('*.png')
+spr_list = glob.glob(os.path.join("sprites", "*.png"))
 font = pygame.font.SysFont("Arial", 14)
 menu = ["Hit Box", "Hurt Box", "Clear", "Save"]
 
