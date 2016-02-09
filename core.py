@@ -211,3 +211,4 @@ def game_start(game_init=None):
         mousePrev = mouseInput
         pygame.display.update()
         clock.tick(FPS)
+    print "end"
